@@ -1,0 +1,76 @@
+
+home         : "/scratch3/NCEPDEV/swpc/noscrub/Joseph.Schoonover/demo"
+setup_path   : "TEST"
+ipe_url     : "https://github.com/SWPC-IPE/WAM-IPE"
+ipe_branch  : "ipe_refactor"
+# Directory, relative to home/setup_path, where SELF-Fluids will be downloaded to.
+ipe_repo    : "WAM-IPE"
+ipe_run     : "runs"
+ipe_install : "install"
+
+scheduler : "qsub"
+
+# Consistency check parameters
+file_type     : "hdf5"
+abs_tolerance : 1.0e-05
+
+# Flags to pass at the configure stage for all builds.
+config_flags : ""
+
+
+configs:
+  - config :
+      name               : "intel-18.1.163-serial"
+      dep_modules        : "intel/18.1.163 hdf5 netcdf"
+      build_flags        : ""
+      omp_num_threads    : 1
+      num_mpi_ranks      : 1
+      num_nodes          : 1
+      num_tasks          : 1
+      num_tasks_per_node : 1
+      cpus_per_task      : 1
+      job_wall_time      : "30:00"
+      partition          : "debug"
+
+  - config :
+      name               : "intel-18.1.163-impi-5.1.2.150"
+      dep_modules        : "intel/18.1.163 impi/5.1.2.150 hdf5parallel/1.8.14 netcdf-hdf5parallel/4.4.0"
+      build_flags        : "--enable-mpi"
+      omp_num_threads    : 1
+      num_mpi_ranks      : 16
+      num_nodes          : 1
+      num_tasks          : 16
+      num_tasks_per_node : 16
+      cpus_per_task      : 1
+      job_wall_time      : "30:00"
+      partition          : "debug"
+
+tests:
+  - test :
+      name               : "March-16-2013"
+      input_directory    : "examples/March-16-2013"
+      data_directory     : "/scratch3/NCEPDEV/swpc/noscrub/Joseph.Schoonover/refactored_input_decks"
+
+
+variables :
+  - variable :
+      name : "/model_output/x_momentum"
+
+  - variable :
+      name : "/model_output/y_momentum"
+
+  - variable :
+      name : "/model_output/z_momentum"
+
+  - variable :
+      name : "/model_output/density"
+
+  - variable :
+      name : "/model_output/density_weighted_temperature"
+
+  - variable :
+      name : "/model_output/density_weighted_tracer"
+
+  - variable :
+      name : "/model_output/pressure"
+
