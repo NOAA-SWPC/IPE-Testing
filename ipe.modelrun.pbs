@@ -1,0 +1,72 @@
+#!/bin/bash
+# 
+#
+# ///////////////////////////////////////////////////////////////////////////////// #
+#
+# In order to use this script the following environment variables need to be set
+#
+# How many nodes are needed
+#  --nodes
+#
+#  --ntasks
+#
+# How many MPI tasks per node
+#  --ntasks-per-node  
+#
+# How many physical CPU’s per task
+#  --cpus-per-task
+#  
+# How long the job is anticipated to run
+#  --time
+# 
+# The name of the job
+#  --job-name
+#
+# ///////////////////////////////////////////////////////////////////////////////// #
+
+
+
+pwd; hostname
+compute_host=$(hostname)
+module purge
+
+
+
+
+run_model(){
+
+  mkdir -p $1
+  cd $1
+
+  ${INS_DIR}/bin/ipe 
+
+  echo $? > ${RUN_DIR}/run.check
+
+}
+
+run_mpi_model(){
+
+  mkdir -p $1
+  cd $1
+
+  mpirun -np ${N_MPI_TASKS} ${INS_DIR}/bin/ipe
+
+  echo $? > ${RUN_DIR}/run.check
+
+}
+
+if [ "$HAVE_MPI" = "no" ];
+then
+
+  module load ${MODULES}
+  run_model ${RUN_DIR}
+  module unload ${MODULES}
+
+else
+
+  module load ${MODULES}
+  run_mpi_model ${RUN_DIR}
+  module unload ${MODULES}
+
+fi
+
