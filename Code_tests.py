@@ -162,7 +162,7 @@ export OMP_NUM_THREADS={0}
 export INS_DIR="{1}"
 export RUN_DIR="{2}"
 export MODULES="{3}"
-export SELFDIR="{4}"
+export IPEDIR="{4}"
 export HAVE_MPI="{5}"
 export TEST_CASE="{6}"
 export N_MPI_RANKS={15}
@@ -176,7 +176,7 @@ sbatch --export=ALL \\
        --time={12} \\
        --job-name="{13}" \\
        --output="{14}" \\
-       {16}/ipe.modelrun.slurm
+       {16}/ipe.modelrun
 
 """.format( config["config"]["omp_num_threads"],
             install_base+"/"+config["config"]["name"],
@@ -199,25 +199,12 @@ sbatch --export=ALL \\
         run_instructions = """
 #/bin/bash
 
-export OMP_NUM_THREADS={0}
-export INS_DIR="{1}"
-export RUN_DIR="{2}"
-export MODULES="{3}"
-export SELFDIR="{4}"
-export HAVE_MPI="{5}"
-export TEST_CASE="{6}"
-export N_MPI_RANKS={15}
-
-sbatch --export=ALL \\
-       --nodes={7} \\
-       --ntasks={8} \\
-       --ntasks-per-node={9} \\
-       --cpus-per-task={10} \\
-       --partition={11} \\
-       --time={12} \\
-       --job-name="{13}" \\
-       --output="{14}" \\
-       {16}/ipe.modelrun.pbs
+qsub -v OMP_NUM_THREADS={0},INS_DIR="{1}",RUN_DIR="{2}",MODULES="{3}",IPEDIR="{4}",HAVE_MPI="{5}",TEST_CASE="{6}",N_MPI_RANKS={7}  \\
+     -l nodes={7}:ppn={8},walltime={9} \\
+     -q {10} \\
+     -N {11} \\
+     -o {12} \\
+     {13}/ipe.modelrun
 
 """.format( config["config"]["omp_num_threads"],
             install_base+"/"+config["config"]["name"],
@@ -226,16 +213,15 @@ sbatch --export=ALL \\
             ipe_path,
             have_mpi,
             test["test"]["name"],
+            config["config"]["num_mpi_ranks"],
             config["config"]["num_nodes"],
-            config["config"]["num_tasks"],
             config["config"]["num_tasks_per_node"],
-            config["config"]["cpus_per_task"],
-            config["config"]["partition"],
             config["config"]["job_wall_time"],
+            config["config"]["partition"],
             "ipe-"+configs["ipe_branch"]+"-"+config["config"]["name"]+"-"+test["test"]["name"],
             run_path +"/run.log", 
-            config["config"]["num_mpi_ranks"],
             cwd )
+
       else if configs["scheduler"] == "none"
         run_instructions = """
 #/bin/bash
@@ -244,7 +230,7 @@ export OMP_NUM_THREADS={0}
 export INS_DIR="{1}"
 export RUN_DIR="{2}"
 export MODULES="{3}"
-export SELFDIR="{4}"
+export IPEDIR="{4}"
 export HAVE_MPI="{5}"
 export TEST_CASE="{6}"
 export N_NODES={7}
